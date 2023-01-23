@@ -1,19 +1,21 @@
 package com.example.learningandroid;
-
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     EditText emailField;
     EditText passwordField;
     EditText userName;
-
     Button createAccount;
+
+    TextView textView1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +29,10 @@ public class MainActivity extends AppCompatActivity {
         userName = findViewById(R.id.username);
         passwordField = findViewById(R.id.password);
         createAccount = findViewById(R.id.create_account);
+        textView1 = findViewById(R.id.text1);
+        textView1.setOnClickListener(v -> {
+           showAlert(MainActivity.this);
+        });
         createAccount.setOnClickListener(v -> {
             emailField.getText();
             userName.getText();
@@ -41,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
                 toast.show();
                 return;
             }
-            if(passwordField.getText().equals("") || (passwordField.getText().length() < 8)) {
+            if((passwordField.getText().length() < 8)) {
                 Toast toast = Toast.makeText(getBaseContext(),  "Password must contains at least 8 characters", Toast.LENGTH_SHORT);
                 toast.show();
                 return;
@@ -50,5 +56,14 @@ public class MainActivity extends AppCompatActivity {
             Toast successMessage = Toast.makeText(getBaseContext(), "Account Created Successfully", Toast.LENGTH_LONG);
             successMessage.show();
         });
+    }
+
+    void showAlert(Context context) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(context);
+        alert.setTitle("Privacy & Policy");
+        alert.setMessage("Privacy & Policy here.....");
+        alert.setCancelable(true);
+        alert.setPositiveButton("Ok", (dialog, which) -> dialog.cancel());
+        alert.show();
     }
 }
