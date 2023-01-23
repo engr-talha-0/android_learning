@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">LearningAndroid</string>
+    <string name="enter_password">Enter Password</string>
+    <string name="enter_username">Enter username</string>
+    <string name="enter_email">Enter Email</string>
+    <string name="create_account">Create Account</string>
+</resources>
