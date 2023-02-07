@@ -1,19 +1,31 @@
 package com.example.learningandroid;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.learningandroid.api_service.RetrofitApi;
+import com.example.learningandroid.home.HomeActivity;
+import com.example.learningandroid.models.DataModel;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class MainActivity extends AppCompatActivity {
     EditText emailField;
     EditText passwordField;
-    EditText userName;
-    Button createAccount;
+    Button login;
+    Button signUp;
 
     TextView textView1;
 
@@ -26,24 +38,18 @@ public class MainActivity extends AppCompatActivity {
 
     public void setViews() {
         emailField = findViewById(R.id.email_address);
-        userName = findViewById(R.id.username);
         passwordField = findViewById(R.id.password);
-        createAccount = findViewById(R.id.create_account);
+        login = findViewById(R.id.login);
+        signUp = findViewById(R.id.sign_up);
         textView1 = findViewById(R.id.text1);
         textView1.setOnClickListener(v -> {
            showAlert(MainActivity.this);
         });
-        createAccount.setOnClickListener(v -> {
+        login.setOnClickListener(v -> {
             emailField.getText();
-            userName.getText();
             passwordField.getText();
             if(emailField.getText().length()<3) {
-                Toast toast = Toast.makeText(getBaseContext(),  "Please Enter Valid Email", Toast.LENGTH_SHORT);
-                toast.show();
-                return;
-            }
-            if(userName.getText().length()<3) {
-                Toast toast = Toast.makeText(getBaseContext(),  "Please Enter User Name", Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(getBaseContext(),  "Please Enter Valid Email/Username", Toast.LENGTH_SHORT);
                 toast.show();
                 return;
             }
@@ -52,9 +58,17 @@ public class MainActivity extends AppCompatActivity {
                 toast.show();
                 return;
             }
-
-            Toast successMessage = Toast.makeText(getBaseContext(), "Account Created Successfully", Toast.LENGTH_LONG);
+            postData(emailField.getText().toString(), passwordField.getText().toString());
+            Toast successMessage = Toast.makeText(getBaseContext(), "Login Successfully", Toast.LENGTH_LONG);
             successMessage.show();
+//            Intent homeIntent = new Intent(MainActivity.this, HomeActivity.class);
+//            MainActivity.this.startActivity(homeIntent);
+//            MainActivity.this.finish();
+        });
+
+        signUp.setOnClickListener(v -> {
+            Intent myIntent = new Intent(MainActivity.this, SignUpScreen.class);//Optional parameters
+            MainActivity.this.startActivity(myIntent);
         });
     }
 
@@ -65,5 +79,30 @@ public class MainActivity extends AppCompatActivity {
         alert.setCancelable(true);
         alert.setPositiveButton("Ok", (dialog, which) -> dialog.cancel());
         alert.show();
+    }
+    private void postData(String name, String job) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://reqres.in/api/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        RetrofitApi retrofitAPI = retrofit.create(RetrofitApi.class);
+        DataModel modal = new DataModel(name, job);
+
+        Call<DataModel> call = retrofitAPI.createPost(modal);
+
+        call.enqueue(new Callback<DataModel>() {
+            @Override
+            public void onResponse(@NonNull Call<DataModel> call, @NonNull Response<DataModel> response) {
+                Toast.makeText(MainActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
+
+                DataModel responseFromAPI = response.body();
+                assert responseFromAPI != null;
+                String responseString = "Response Code : " + response.code() + "\nName : " + responseFromAPI.getName() + "\n" + "lastName : " + responseFromAPI.getJob();
+            }
+            @Override
+            public void onFailure(@NonNull Call<DataModel> call, @NonNull Throwable t) {
+
+            }
+        });
     }
 }
